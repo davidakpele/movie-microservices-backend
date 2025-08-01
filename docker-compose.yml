@@ -1,0 +1,115 @@
+version: '3.8'
+
+services:
+
+  discovery-server:
+    build: ./discovery-server
+    container_name: discovery-server
+    ports:
+      - "8761:8761"
+    networks:
+      - app-network
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - discovery-server
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=${EUREKA_URL}
+    networks:
+      - app-network
+
+  movie-service:
+    build: ./movie-service
+    container_name: movie-service
+    depends_on:
+      - movie-db
+      - discovery-server
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://movie-db:5432/${MOVIEDB_NAME}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=${EUREKA_URL}
+    networks:
+      - app-network
+
+  movie-db:
+    image: postgres:15
+    container_name: movie-db
+    environment:
+      - POSTGRES_DB=${MOVIEDB_NAME}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "5433:5432"
+    networks:
+      - app-network
+
+  rating-service:
+    build: ./rating-service
+    container_name: rating-service
+    depends_on:
+      - rating-db
+      - discovery-server
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://rating-db:5432/${RATINGDB_NAME}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=${EUREKA_URL}
+    networks:
+      - app-network
+
+  rating-db:
+    image: postgres:15
+    container_name: rating-db
+    environment:
+      - POSTGRES_DB=${RATINGDB_NAME}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "5434:5432"
+    networks:
+      - app-network
+
+  review-service:
+    build: ./review-service
+    container_name: review-service
+    depends_on:
+      - review-db
+      - discovery-server
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://review-db:5432/${REVIEWDB_NAME}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=${EUREKA_URL}
+    networks:
+      - app-network
+
+  review-db:
+    image: postgres:15
+    container_name: review-db
+    environment:
+      - POSTGRES_DB=${REVIEWDB_NAME}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "5435:5432"
+    networks:
+      - app-network
+
+  stats-service:
+    build: ./stats-service
+    container_name: stats-service
+    depends_on:
+      - discovery-server
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=${EUREKA_URL}
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
