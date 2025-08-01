@@ -64,15 +64,15 @@ The project consists of 6 microservices: :
 
 ```
 movie-microservices/
-├── discovery-server/          # Serveur Eureka
-├── api-gateway/              # Passerelle API
-├── movie-service/            # Service de films
-├── rating-service/           # Service de notes
-├── review-service/           # Service de commentaires
-├── stats-service/            # Service de statistiques
-├── .github/workflows/        # Pipeline CI/CD
-├── docker-compose.yml        # Orchestration Docker
-├── init-db.sql              # Script d'initialisation DB
+├── discovery-server/          # Eureka Server
+├── api-gateway/              # API Gateway
+├── movie-service/            # Movie Service
+├── rating-service/           # Rating Service
+├── review-service/           # Review Service
+├── stats-service/            # Statistics Service
+├── .github/workflows/        # CI/CD Pipeline
+├── docker-compose.yml        # Docker Orchestration
+├── init-db.sql               # DB Initialization Script
 └── README.md                 # Documentation
 ```
 
